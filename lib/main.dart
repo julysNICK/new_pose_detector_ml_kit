@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
+import 'package:new_pose_test/class_barbell.dart';
 
 late List<CameraDescription> cameras;
 void main() async {
@@ -49,6 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Pose> poses = <Pose>[];
   double distanceWristAndShoulder = 0.0;
   double angleWristAndShoulder = 0.0;
+  String suggestion = "";
+  int count = 0;
   @override
   void initState() {
     super.initState();
@@ -77,8 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       controller.startImageStream((CameraImage image) async {
         if (!isBusy) {
-          print("isBusy = $isBusy");
-          print("image = $image");
           isBusy = true;
           img = image;
           doPoseDetectionOnFrame();
@@ -89,35 +90,37 @@ class _MyHomePageState extends State<MyHomePage> {
 
   dynamic _scanResults;
   CameraImage? img;
+  bool isRepeting = false;
+  AngleTracker angleTracker = AngleTracker();
   doPoseDetectionOnFrame() async {
-    print("doPoseDetectionOnFrame");
     var frameImg = getInputImage();
-    print("frameImg = $frameImg");
+
     poses = await poseDetection.processImage(frameImg);
-    print(poses.length);
+
     for (Pose pose in poses) {
       // to access all landmarks
       pose.landmarks.forEach((_, landmark) {
         final type = landmark.type;
         final x = landmark.x;
         final y = landmark.y;
-        print("type = $type, x = $x, y = $y");
       });
 
       // to access specific landmarks
       final landmark = pose.landmarks[PoseLandmarkType.nose];
       final eyeLeft = pose.landmarks[PoseLandmarkType.leftEye];
       final eyeRight = pose.landmarks[PoseLandmarkType.rightEye];
-      print(eyeLeft?.x);
-      print(eyeRight?.x);
-      print(landmark?.x);
 
-      double distanceWristAndShoulder =
-          calculateDistanceBetweenWristAndShoulder(pose);
-      double angleC = calculateRepetitionInBarbellCurls(pose);
+      // double distanceWristAndShoulder =
+      //     calculateDistanceBetweenWristAndShoulder(pose);
+      double angleC = calculateAngleInBarbellCurls(pose);
+
+      int count = angleTracker.calculationRepetition2(angleC);
+      String suggestion = postSuggestion(angleC);
 
       setState(() {
-        this.distanceWristAndShoulder = distanceWristAndShoulder;
+        distanceWristAndShoulder = distanceWristAndShoulder;
+        this.count = this.count + count;
+        this.suggestion = suggestion;
         angleWristAndShoulder = angleC;
       });
     }
@@ -151,7 +154,6 @@ class _MyHomePageState extends State<MyHomePage> {
     if (rotationCompensation == null) return null;
 
     if (camera.lensDirection == CameraLensDirection.front) {
-      print("estou no front");
       rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
     } else {
       rotationCompensation =
@@ -183,7 +185,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   InputImage getInputImage2() {
-    print("chamei");
     final WriteBuffer allBytes = WriteBuffer();
     for (final Plane plane in img!.planes) {
       allBytes.putUint8List(plane.bytes);
@@ -244,9 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return result;
   }
 
-  double calculateRepetitionInBarbellCurls(Pose pose) {
-    int count = 0;
-
+  double calculateAngleInBarbellCurls(Pose pose) {
     final PoseLandmark wrist = pose.landmarks[PoseLandmarkType.leftWrist]!;
     final PoseLandmark shoulder =
         pose.landmarks[PoseLandmarkType.leftShoulder]!;
@@ -255,12 +254,112 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final double angle = getAngle(wrist, elbow, shoulder);
 
-    // if (angle > 160 && angle < 200) {
-    //   count++;
-    // }
-
-    // return count;
     return angle;
+  }
+
+  bool isAboveThreshold = false;
+  bool hasCompletedRepetition = false;
+
+  int calculateRepetition(double angle) {
+    int count = 0;
+    double angleThresholdMin = 45.0;
+
+    double angleThresholdMax = 150.0;
+
+    if (angle <= angleThresholdMin && angle >= angleThresholdMax) {
+      if (!isAboveThreshold) {
+        isAboveThreshold = true;
+      } else if (isAboveThreshold && !hasCompletedRepetition) {
+        hasCompletedRepetition = true;
+        count++;
+      }
+    } else {
+      isAboveThreshold = false;
+      hasCompletedRepetition = false;
+    }
+
+    return count;
+  }
+
+  int calculateRepetition2(double angle) {
+    int count = 0;
+    double angleThresholdMin = 45.0;
+
+    double angleThresholdMax = 150.0;
+
+    int repetitionInLastFrame = 0;
+
+    if (angle <= angleThresholdMin && angle >= angleThresholdMax) {
+      repetitionInLastFrame++;
+    } else {
+      repetitionInLastFrame = 0;
+    }
+
+    return repetitionInLastFrame;
+  }
+
+  int calculateRepetition3(double angle) {
+    int count = 0;
+    double angleThresholdMin = 45.0;
+
+    double angleThresholdMax = 150.0;
+
+    int repetitionInLastFrame = 0;
+
+    if (angle <= angleThresholdMin && angle >= angleThresholdMax) {
+      repetitionInLastFrame++;
+    } else {
+      if (repetitionInLastFrame > 0) {
+        count++;
+      }
+      repetitionInLastFrame = 0;
+    }
+
+    return count;
+  }
+
+  int calculateRepetition4(double angle) {
+    int count = 0;
+    double angleThresholdMin = 45.0;
+
+    double angleThresholdMax = 150.0;
+
+    String movimentState = "desconhecido";
+
+    if (angle <= angleThresholdMin && angle >= angleThresholdMax) {
+      if (movimentState == "desconhecido") {
+        movimentState = "subindo";
+      } else if (movimentState == "subindo") {
+        movimentState = "subindo";
+      } else if (movimentState == "descendo") {
+        movimentState = "subindo";
+        count++;
+      }
+    } else {
+      if (movimentState == "desconhecido") {
+        movimentState = "descendo";
+      } else if (movimentState == "subindo") {
+        movimentState = "descendo";
+      } else if (movimentState == "descendo") {
+        movimentState = "descendo";
+      }
+    }
+
+    return count;
+  }
+
+  String postSuggestion(double angle) {
+    String suggestion = "";
+    double angleThresholdMin = 50.0;
+
+    double angleThresholdMax = 160.0;
+
+    if (angle < angleThresholdMin) {
+      suggestion = "Subindo";
+    } else if (angle > angleThresholdMax) {
+      suggestion = "Descendo";
+    }
+    return suggestion;
   }
 
   Widget buildResult() {
@@ -331,6 +430,27 @@ class _MyHomePageState extends State<MyHomePage> {
       //     ),
       //   ),
       // );
+      // stackChildren.add(
+      //   Positioned(
+      //     top: 0.0,
+      //     left: 0.0,
+      //     width: size.width,
+      //     height: size.height,
+      //     child: Container(
+      //       child: Column(
+      //         children: [
+      //           Text(
+      //             "Calculate angle wrist and shoulder: $angleWristAndShoulder",
+      //             style: const TextStyle(
+      //               color: Colors.white,
+      //               fontSize: 15.0,
+      //             ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // );
       stackChildren.add(
         Positioned(
           top: 0.0,
@@ -341,10 +461,24 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               children: [
                 Text(
+                  "Repetitions: $count",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.0,
+                  ),
+                ),
+                Text(
+                  "Suggestion: $suggestion",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.0,
+                  ),
+                ),
+                Text(
                   "Calculate angle wrist and shoulder: $angleWristAndShoulder",
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 30.0,
+                    fontSize: 20.0,
                   ),
                 ),
               ],
