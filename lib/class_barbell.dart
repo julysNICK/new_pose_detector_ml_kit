@@ -1,18 +1,16 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
 class AngleTracker {
-  int historyLength = 5;
-  double angleThresholdMin = 20.0;
-  double angleThresholdMax = 160.0;
-  int complete = 0;
+  int historyLength = 3;
+  double angleThresholdMin = 50.0;
+  double angleThresholdMax = 140.0;
 
   AngleTracker({
-    this.historyLength = 5,
-    this.angleThresholdMin = 20.0,
-    this.angleThresholdMax = 160.0,
+    this.historyLength = 3,
+    this.angleThresholdMin = 50.0,
+    this.angleThresholdMax = 140.0,
   });
 
   final List<double> angleHistory = [];
@@ -42,12 +40,15 @@ class AngleTracker {
   }
 
   int calculationRepetition2(double angle) {
-    addAngleInArray(angleHistory, angle, 5);
+    //mudar a angulação na hora da descida
+    print(angle);
+    addAngleInArray(angleHistory, angle, 2);
 
-    verifyArray(angleHistory, historyLength);
+    // verifyArray(angleHistory, historyLength);
 
-    verifyIfExistRepetitions(angleHistory);
+    // verifyIfExistRepetitions(angleHistory);
 
+    print("angleHistory.length ${angleHistory.length}");
     if (angleHistory.length > historyLength) {
       angleHistory.removeAt(0);
     }
@@ -55,28 +56,95 @@ class AngleTracker {
         a.round() >= angleThresholdMin && a.round() <= angleThresholdMax);
     if (angleHistory.length == historyLength &&
         isAngleInRange &&
-        angleHistory.last <= 60) {
+        angleHistory.last <= 90) {
+      //60
+      print("angleHistoryApproved");
       angleHistoryApproved.addAll(angleHistory);
-      angleHistory.clear();
-      complete++;
+      print(angleHistoryApproved);
 
+      angleHistory.clear();
       return 1;
     }
 
     return 0;
   }
 
-  void addAngleInArray(List<double> angleArray, double angle, double diff) {
+  int calculationRepetition3(double angle) {
+    addAngleInArray2(angleHistory, angle, 3);
+
+    verifyArray(angleHistory, historyLength);
+
+    print("angleHistory: $angleHistory");
+
+    // verifyIfExistRepetitions(angleHistory);
+
+    // if (angleHistory.length > historyLength) {
+    //   angleHistory.removeAt(0);
+    // }
+    // bool isAngleInRange = angleHistory.every((a) =>
+    //     a.round() >= angleThresholdMin && a.round() <= angleThresholdMax);
+    // if (angleHistory.length == historyLength &&
+    //     isAngleInRange &&
+    //     angleHistory.last <= 60) {
+    //   angleHistoryApproved.addAll(angleHistory);
+    //   angleHistory.clear();
+    //   complete++;
+
+    //   return 1;
+    // }
+
+    bool isAngleInRange = angleHistory.every((a) =>
+        a.round() >= angleThresholdMin && a.round() <= angleThresholdMax);
+
+    if (angleHistory.length == historyLength &&
+        isAngleInRange &&
+        angleHistory.last <= 70) {
+      angleHistoryApproved.addAll(angleHistory);
+      angleHistory.clear();
+      return 1;
+    }
+
+    return 0;
+  }
+
+  void addAngleInArray2(List<double> angleArray, double angle, double diff) {
     double? theLastAngle = angleArray.isNotEmpty ? angleArray.last : null;
     int roundedAngle = angle.round();
+    print("roundedAngle: $roundedAngle");
 
-    if (theLastAngle == null && (roundedAngle >= 150 && roundedAngle <= 160)) {
+    // if (theLastAngle == null && (roundedAngle >= 150 && roundedAngle <= 160)) {
+    //   angleArray.add(angle.roundToDouble());
+    // } else if (theLastAngle != null &&
+    //     (roundedAngle <= 140 && roundedAngle >= 55)) {
+    //   double diffAngle = theLastAngle - angle;
+
+    //   if (diffAngle > diff) {
+    //     angleArray.add(angle);
+    //   }
+    // }
+
+    var inBetweenInFall = (roundedAngle >= 130 && roundedAngle <= 140);
+    print("inBetweenInFall: $inBetweenInFall");
+    var inBetweenRise = (roundedAngle >= 50 && roundedAngle < 130);
+    print("inBetweenRise: $inBetweenRise");
+    // var inBetweenMiddle = (roundedAngle >= 140 && roundedAngle < 50);
+
+    if (theLastAngle == null && inBetweenInFall) {
+      print("theLastAngle == null && inBetweenInFall");
       angleArray.add(angle.roundToDouble());
     } else if (theLastAngle != null &&
-        (roundedAngle <= 140 && roundedAngle >= 55)) {
+        inBetweenInFall &&
+        angle < theLastAngle) {
+      print("theLastAngle != null && inBetweenInFall && angle < theLastAngle");
       double diffAngle = theLastAngle - angle;
-
       if (diffAngle > diff) {
+        angleArray.add(angle);
+      }
+    } else if (theLastAngle != null && inBetweenRise && angle < theLastAngle) {
+      print("theLastAngle != null && inBetweenRise && angle > theLastAngle");
+      double diffAngle = angle - theLastAngle;
+      print("diffAngle: $diffAngle");
+      if (diffAngle.abs() > diff) {
         angleArray.add(angle);
       }
     }
@@ -91,21 +159,52 @@ class AngleTracker {
     }
   }
 
+  void addAngleInArray(List<double> angleArray, double angle, double diff) {
+    double? theLastAngle = angleArray.isNotEmpty ? angleArray.last : null;
+    int roundedAngle = angle.round();
+
+    if (theLastAngle == null && (roundedAngle >= 130 && roundedAngle <= 160)) {
+      print("first angle added $angle");
+      angleArray.add(angle.roundToDouble());
+    } else if (theLastAngle != null &&
+        (roundedAngle <= 140 && roundedAngle >= 85)) {
+      //55
+      print(" linha 80angle added $angle");
+      double diffAngle = theLastAngle - angle;
+      print("double diffAngle = $theLastAngle - $angle");
+      print("linha 83 diffAngle $diffAngle");
+
+      if (diffAngle > diff) {
+        print("linha 86 angle added $angle");
+        angleArray.add(angle);
+      }
+    }
+  }
+
+  void verifyArray2(List<double> angleArray, int length) {
+    if (angleArray.isNotEmpty) {
+      double? theLastAngle = angleArray.last;
+      if (angleArray.length == length && theLastAngle > 60) {
+        angleArray.removeAt(0);
+      }
+    }
+  }
+
   void verifyIfExistRepetitions(List<double> angleArray) {
     bool existsNumbersRepeated = false;
     Set<double> withoutRepetitions;
 
-    angleArray.forEach((angle) {
+    for (var angle in angleArray) {
       int count = 0;
-      angleArray.forEach((angle2) {
+      for (var angle2 in angleArray) {
         if (angle == angle2) {
           count++;
         }
-      });
+      }
       if (count > 1) {
         existsNumbersRepeated = true;
       }
-    });
+    }
 
     if (existsNumbersRepeated) {
       withoutRepetitions = angleArray.toSet();

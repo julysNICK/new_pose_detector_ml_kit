@@ -99,22 +99,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
     for (Pose pose in poses) {
       // to access all landmarks
-      pose.landmarks.forEach((_, landmark) {
-        final type = landmark.type;
-        final x = landmark.x;
-        final y = landmark.y;
-      });
+      // pose.landmarks.forEach((_, landmark) {
+      //   // final type = landmark.type;
+      //   // final x = landmark.x;
+      //   // final y = landmark.y;
+      // });
 
       // to access specific landmarks
-      final landmark = pose.landmarks[PoseLandmarkType.nose];
-      final eyeLeft = pose.landmarks[PoseLandmarkType.leftEye];
-      final eyeRight = pose.landmarks[PoseLandmarkType.rightEye];
+      // final landmark = pose.landmarks[PoseLandmarkType.nose];
+      // final eyeLeft = pose.landmarks[PoseLandmarkType.leftEye];
+      // final eyeRight = pose.landmarks[PoseLandmarkType.rightEye];
 
       // double distanceWristAndShoulder =
       //     calculateDistanceBetweenWristAndShoulder(pose);
       double angleC = calculateAngleInBarbellCurls(pose);
 
-      int count = angleTracker.calculationRepetition2(angleC);
+      int count = angleTracker.calculationRepetition3(angleC);
       String suggestion = postSuggestion(angleC);
 
       setState(() {
@@ -598,12 +598,12 @@ class PosePainter extends CustomPainter {
 
       //Draw legs
       paintLine(PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, leftPaint);
+      // paintLine(
+      //     PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, leftPaint);
       paintLine(
           PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee, rightPaint);
-      paintLine(
-          PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, rightPaint);
+      // paintLine(
+      //     PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, rightPaint);
 
       paintLine(
           PoseLandmarkType.leftWrist, PoseLandmarkType.leftThumb, leftPaint);
