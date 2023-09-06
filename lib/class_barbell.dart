@@ -69,6 +69,12 @@ class AngleTracker {
     return 0;
   }
 
+  double slopeLineShoulderAndHip(
+      double xShoulder, double yShoulder, double xHip, double yHip) {
+    double m = (yHip - yShoulder) / (xHip - xShoulder);
+    return m;
+  }
+
   int calculationRepetition3(double angle) {
     addAngleInArray2(angleHistory, angle, 3);
 

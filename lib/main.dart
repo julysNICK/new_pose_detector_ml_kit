@@ -117,11 +117,18 @@ class _MyHomePageState extends State<MyHomePage> {
       int count = angleTracker.calculationRepetition3(angleC);
       String suggestion = postSuggestion(angleC);
 
+      double distanceWristAndShoulder = angleTracker.slopeLineShoulderAndHip(
+        pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
+        pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
+        pose.landmarks[PoseLandmarkType.leftHip]!.x,
+        pose.landmarks[PoseLandmarkType.leftHip]!.y,
+      );
+
       setState(() {
         distanceWristAndShoulder = distanceWristAndShoulder;
         this.count = this.count + count;
         this.suggestion = suggestion;
-        angleWristAndShoulder = angleC;
+        angleWristAndShoulder = distanceWristAndShoulder;
       });
     }
     // print("faces present = ${faces.length}");
@@ -475,7 +482,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 Text(
-                  "Calculate angle wrist and shoulder: $angleWristAndShoulder",
+                  "Slope Rect: $angleWristAndShoulder",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20.0,
