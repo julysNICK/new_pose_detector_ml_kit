@@ -98,20 +98,6 @@ class _MyHomePageState extends State<MyHomePage> {
     poses = await poseDetection.processImage(frameImg);
 
     for (Pose pose in poses) {
-      // to access all landmarks
-      // pose.landmarks.forEach((_, landmark) {
-      //   // final type = landmark.type;
-      //   // final x = landmark.x;
-      //   // final y = landmark.y;
-      // });
-
-      // to access specific landmarks
-      // final landmark = pose.landmarks[PoseLandmarkType.nose];
-      // final eyeLeft = pose.landmarks[PoseLandmarkType.leftEye];
-      // final eyeRight = pose.landmarks[PoseLandmarkType.rightEye];
-
-      // double distanceWristAndShoulder =
-      //     calculateDistanceBetweenWristAndShoulder(pose);
       double angleC = calculateAngleInBarbellCurls(pose);
 
       int count = angleTracker.calculationRepetition3(angleC);
@@ -131,9 +117,6 @@ class _MyHomePageState extends State<MyHomePage> {
         angleWristAndShoulder = distanceWristAndShoulder;
       });
     }
-    // print("faces present = ${faces.length}");
-
-    // checkSpinePosture();
 
     setState(() {
       _scanResults = poses;
@@ -201,11 +184,9 @@ class _MyHomePageState extends State<MyHomePage> {
     final camera = cameraDescription;
     InputImageRotation? imageRotation =
         InputImageRotationValue.fromRawValue(camera.sensorOrientation);
-    // if (imageRotation == null) return;
 
     final inputImageFormat =
         InputImageFormatValue.fromRawValue(img!.format.raw);
-    // if (inputImageFormat == null) return null;
 
     final planeData = img!.planes.map(
       (Plane plane) {
