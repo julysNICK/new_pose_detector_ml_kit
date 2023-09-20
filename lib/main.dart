@@ -15,6 +15,7 @@ void main() async {
   runApp(const MyApp());
 }
 
+//1,5 até 1,7 está bom/ 1,4 para baixo a coluna está arqueada/ 1,8 para cima a coluna está arqueada
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -103,12 +104,15 @@ class _MyHomePageState extends State<MyHomePage> {
       int count = angleTracker.calculationRepetition3(angleC);
       String suggestion = postSuggestion(angleC);
 
-      double distanceWristAndShoulder = angleTracker.slopeLineShoulderAndHip(
+      double distanceWristAndShoulder =
+          angleTracker.slopeLineShoulderAndHipWithAngle2(
         pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
         pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
         pose.landmarks[PoseLandmarkType.leftHip]!.x,
         pose.landmarks[PoseLandmarkType.leftHip]!.y,
       );
+
+      angleTracker.verifySlopeAngle(distanceWristAndShoulder);
 
       setState(() {
         distanceWristAndShoulder = distanceWristAndShoulder;
@@ -449,14 +453,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               children: [
                 Text(
-                  "Repetitions: $count",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                  ),
-                ),
-                Text(
-                  "Suggestion: $suggestion",
+                  "Repetition: $count",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20.0,

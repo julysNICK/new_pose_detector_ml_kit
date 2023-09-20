@@ -16,6 +16,8 @@ class AngleTracker {
   final List<double> angleHistory = [];
   final List<double> angleHistoryApproved = [];
 
+  final List<double> angleHistorySlope = [];
+
   int calculationRepetition(double angle) {
     print("calculationRepetition");
     angleHistory.add(angle);
@@ -75,29 +77,39 @@ class AngleTracker {
     return m;
   }
 
+  double slopeLineShoulderAndHipWithAngle2(
+      double xShoulder, double yShoulder, double xHip, double yHip) {
+    double angle = atan2(yHip - yShoulder, xHip - xShoulder);
+
+    return angle;
+  }
+
+  void verifySlopeAngle(double angle) {
+    angleHistorySlope.add(angle);
+
+    if (angleHistorySlope.length == 5) {
+      double media =
+          angleHistorySlope.reduce((a, b) => a + b) / angleHistorySlope.length;
+
+      print("media: $media");
+      //1,5 até 1,7 está bom/ 1,4 para baixo a coluna está arqueada/ 1,8 para cima a coluna está arqueada
+
+      if (media >= 1.5 && media <= 1.7) {
+        print("coluna reta");
+      } else if (media < 1.5) {
+        print("coluna arqueada para frente");
+      } else if (media > 1.7) {
+        print("coluna arqueada para trás");
+      }
+
+      angleHistorySlope.clear();
+    }
+  }
+
   int calculationRepetition3(double angle) {
     addAngleInArray2(angleHistory, angle, 3);
 
     verifyArray(angleHistory, historyLength);
-
-    print("angleHistory: $angleHistory");
-
-    // verifyIfExistRepetitions(angleHistory);
-
-    // if (angleHistory.length > historyLength) {
-    //   angleHistory.removeAt(0);
-    // }
-    // bool isAngleInRange = angleHistory.every((a) =>
-    //     a.round() >= angleThresholdMin && a.round() <= angleThresholdMax);
-    // if (angleHistory.length == historyLength &&
-    //     isAngleInRange &&
-    //     angleHistory.last <= 60) {
-    //   angleHistoryApproved.addAll(angleHistory);
-    //   angleHistory.clear();
-    //   complete++;
-
-    //   return 1;
-    // }
 
     bool isAngleInRange = angleHistory.every((a) =>
         a.round() >= angleThresholdMin && a.round() <= angleThresholdMax);
@@ -116,18 +128,6 @@ class AngleTracker {
   void addAngleInArray2(List<double> angleArray, double angle, double diff) {
     double? theLastAngle = angleArray.isNotEmpty ? angleArray.last : null;
     int roundedAngle = angle.round();
-    print("roundedAngle: $roundedAngle");
-
-    // if (theLastAngle == null && (roundedAngle >= 150 && roundedAngle <= 160)) {
-    //   angleArray.add(angle.roundToDouble());
-    // } else if (theLastAngle != null &&
-    //     (roundedAngle <= 140 && roundedAngle >= 55)) {
-    //   double diffAngle = theLastAngle - angle;
-
-    //   if (diffAngle > diff) {
-    //     angleArray.add(angle);
-    //   }
-    // }
 
     var inBetweenInFall = (roundedAngle >= 130 && roundedAngle <= 140);
     print("inBetweenInFall: $inBetweenInFall");
@@ -175,10 +175,8 @@ class AngleTracker {
     } else if (theLastAngle != null &&
         (roundedAngle <= 140 && roundedAngle >= 85)) {
       //55
-      print(" linha 80angle added $angle");
+
       double diffAngle = theLastAngle - angle;
-      print("double diffAngle = $theLastAngle - $angle");
-      print("linha 83 diffAngle $diffAngle");
 
       if (diffAngle > diff) {
         print("linha 86 angle added $angle");
@@ -268,12 +266,6 @@ class RepetitionTrack {
           elbowAngles.reduce((a, b) => a + b) / elbowAngles.length;
       double avgDistance =
           wristDistances.reduce((a, b) => a + b) / wristDistances.length;
-
-      // if (avgAngle <= angleThresholdMin &&
-      //     avgAngle >= angleThresholdMax &&
-      //     avgDistance <= distanceThreshold) {
-      //   count++;
-      // }
 
       if (!isCompletingMovement) {
         if (avgAngle >= angleThresholdMin &&
