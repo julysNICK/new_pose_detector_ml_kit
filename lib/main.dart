@@ -6,7 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
-import 'package:new_pose_test/class_barbell.dart';
+import 'package:new_pose_test/class/slope_track.dart';
+import 'package:new_pose_test/class/class_barbell.dart';
 
 late List<CameraDescription> cameras;
 void main() async {
@@ -52,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   double distanceWristAndShoulder = 0.0;
   double angleWristAndShoulder = 0.0;
   String suggestion = "";
+  String slopePosition = "";
   int count = 0;
   @override
   void initState() {
@@ -92,7 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
   dynamic _scanResults;
   CameraImage? img;
   bool isRepeting = false;
-  AngleTracker angleTracker = AngleTracker();
+  BarbellExercise barbellExercise = BarbellExercise();
+  SlopeTrack slopeTrack = SlopeTrack();
   doPoseDetectionOnFrame() async {
     var frameImg = getInputImage();
 
@@ -101,23 +104,25 @@ class _MyHomePageState extends State<MyHomePage> {
     for (Pose pose in poses) {
       double angleC = calculateAngleInBarbellCurls(pose);
 
-      int count = angleTracker.calculationRepetition3(angleC);
+      int count = barbellExercise.calculationRepetition(angleC);
       String suggestion = postSuggestion(angleC);
 
       double distanceWristAndShoulder =
-          angleTracker.slopeLineShoulderAndHipWithAngle2(
+          slopeTrack.slopeLineShoulderAndHipWithAngle(
         pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
         pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
         pose.landmarks[PoseLandmarkType.leftHip]!.x,
         pose.landmarks[PoseLandmarkType.leftHip]!.y,
       );
 
-      angleTracker.verifySlopeAngle(distanceWristAndShoulder);
+      String slopePosition =
+          slopeTrack.verifySlopeAngle(distanceWristAndShoulder);
 
       setState(() {
         distanceWristAndShoulder = distanceWristAndShoulder;
         this.count = this.count + count;
         this.suggestion = suggestion;
+        this.slopePosition = slopePosition;
         angleWristAndShoulder = distanceWristAndShoulder;
       });
     }
@@ -461,6 +466,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Text(
                   "Slope Rect: $angleWristAndShoulder",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.0,
+                  ),
+                ),
+                Text(
+                  "Slope Position: $slopePosition",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20.0,
