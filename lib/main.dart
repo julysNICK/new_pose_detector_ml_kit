@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
+import 'package:new_pose_test/class/image_lib.dart';
 import 'package:new_pose_test/class/slope_track.dart';
 import 'package:new_pose_test/class/class_barbell.dart';
 
@@ -95,9 +96,11 @@ class _MyHomePageState extends State<MyHomePage> {
   CameraImage? img;
   bool isRepeting = false;
   BarbellExercise barbellExercise = BarbellExercise();
+  GetImage getImage = GetImage();
   SlopeTrack slopeTrack = SlopeTrack();
   doPoseDetectionOnFrame() async {
-    var frameImg = getInputImage();
+    var frameImg = getImage.getInputImage(
+        cameraDescription, _orientations, controller, img);
 
     poses = await poseDetection.processImage(frameImg);
 
@@ -105,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
       double angleC = calculateAngleInBarbellCurls(pose);
 
       int count = barbellExercise.calculationRepetition(angleC);
-      String suggestion = postSuggestion(angleC);
+      // String suggestion = postSuggestion(angleC);
 
       double distanceWristAndShoulder =
           slopeTrack.slopeLineShoulderAndHipWithAngle(
@@ -119,11 +122,11 @@ class _MyHomePageState extends State<MyHomePage> {
           slopeTrack.verifySlopeAngle(distanceWristAndShoulder);
 
       setState(() {
-        distanceWristAndShoulder = distanceWristAndShoulder;
-        this.count = this.count + count;
-        this.suggestion = suggestion;
+        // distanceWristAndShoulder = distanceWristAndShoulder;
+        this.count = count + this.count;
+        suggestion = suggestion;
         this.slopePosition = slopePosition;
-        angleWristAndShoulder = distanceWristAndShoulder;
+        // angleWristAndShoulder = distanceWristAndShoulder;
       });
     }
 
@@ -139,99 +142,6 @@ class _MyHomePageState extends State<MyHomePage> {
     DeviceOrientation.portraitDown: 180,
     DeviceOrientation.landscapeRight: 270,
   };
-
-  InputImage? getInputImage() {
-    final camera = cameraDescription;
-
-    final sensorOrientation = camera.sensorOrientation;
-
-    InputImageRotation? imageRotation;
-
-    var rotationCompensation =
-        _orientations[controller!.value.deviceOrientation];
-
-    if (rotationCompensation == null) return null;
-
-    if (camera.lensDirection == CameraLensDirection.front) {
-      rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
-    } else {
-      rotationCompensation =
-          (sensorOrientation - rotationCompensation + 360) % 360;
-    }
-
-    imageRotation = InputImageRotationValue.fromRawValue(rotationCompensation);
-
-    if (imageRotation == null) return null;
-
-    final format = InputImageFormatValue.fromRawValue(img!.format.raw);
-
-    if (format == null ||
-        (Platform.isAndroid && format != InputImageFormat.nv21) ||
-        (Platform.isIOS && format != InputImageFormat.bgra8888)) return null;
-
-    if (img!.planes.isEmpty) return null;
-
-    final plane = img!.planes.first;
-
-    return InputImage.fromBytes(
-        bytes: plane.bytes,
-        metadata: InputImageMetadata(
-          size: Size(img!.width.toDouble(), img!.height.toDouble()),
-          rotation: imageRotation,
-          format: format,
-          bytesPerRow: plane.bytesPerRow,
-        ));
-  }
-
-  InputImage getInputImage2() {
-    final WriteBuffer allBytes = WriteBuffer();
-    for (final Plane plane in img!.planes) {
-      allBytes.putUint8List(plane.bytes);
-    }
-    final bytes = allBytes.done().buffer.asUint8List();
-    final Size imageSize = Size(img!.width.toDouble(), img!.height.toDouble());
-    final camera = cameraDescription;
-    InputImageRotation? imageRotation =
-        InputImageRotationValue.fromRawValue(camera.sensorOrientation);
-
-    final inputImageFormat =
-        InputImageFormatValue.fromRawValue(img!.format.raw);
-
-    final planeData = img!.planes.map(
-      (Plane plane) {
-        return InputImageMetadata(
-          rotation: imageRotation!,
-          size: imageSize,
-          format: inputImageFormat!,
-          bytesPerRow: plane.bytesPerRow,
-        );
-      },
-    ).toList();
-
-    final inputImage =
-        InputImage.fromBytes(bytes: bytes, metadata: planeData[0]);
-
-    return inputImage;
-  }
-
-  double calculateDistanceBetweenWristAndShoulder(Pose pose) {
-    final PoseLandmark wrist = pose.landmarks[PoseLandmarkType.leftWrist]!;
-    final PoseLandmark shoulder =
-        pose.landmarks[PoseLandmarkType.leftShoulder]!;
-    final double distance =
-        sqrt(pow(wrist.x - shoulder.x, 2) + pow(wrist.y - shoulder.y, 2));
-    return distance;
-  }
-
-  double calculateAngle24_26_28(Pose pose) {
-    final PoseLandmark wrist = pose.landmarks[PoseLandmarkType.leftWrist]!;
-    final PoseLandmark shoulder =
-        pose.landmarks[PoseLandmarkType.leftShoulder]!;
-    final PoseLandmark elbow = pose.landmarks[PoseLandmarkType.leftElbow]!;
-    final double distance =
-        sqrt(pow(wrist.x - shoulder.x, 2) + pow(wrist.y - shoulder.y, 2));
-    return distance;
-  }
 
   getAngle(
       PoseLandmark firstPoint, PoseLandmark midPoint, PoseLandmark lastPoint) {
@@ -256,108 +166,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool isAboveThreshold = false;
   bool hasCompletedRepetition = false;
-
-  int calculateRepetition(double angle) {
-    int count = 0;
-    double angleThresholdMin = 45.0;
-
-    double angleThresholdMax = 150.0;
-
-    if (angle <= angleThresholdMin && angle >= angleThresholdMax) {
-      if (!isAboveThreshold) {
-        isAboveThreshold = true;
-      } else if (isAboveThreshold && !hasCompletedRepetition) {
-        hasCompletedRepetition = true;
-        count++;
-      }
-    } else {
-      isAboveThreshold = false;
-      hasCompletedRepetition = false;
-    }
-
-    return count;
-  }
-
-  int calculateRepetition2(double angle) {
-    int count = 0;
-    double angleThresholdMin = 45.0;
-
-    double angleThresholdMax = 150.0;
-
-    int repetitionInLastFrame = 0;
-
-    if (angle <= angleThresholdMin && angle >= angleThresholdMax) {
-      repetitionInLastFrame++;
-    } else {
-      repetitionInLastFrame = 0;
-    }
-
-    return repetitionInLastFrame;
-  }
-
-  int calculateRepetition3(double angle) {
-    int count = 0;
-    double angleThresholdMin = 45.0;
-
-    double angleThresholdMax = 150.0;
-
-    int repetitionInLastFrame = 0;
-
-    if (angle <= angleThresholdMin && angle >= angleThresholdMax) {
-      repetitionInLastFrame++;
-    } else {
-      if (repetitionInLastFrame > 0) {
-        count++;
-      }
-      repetitionInLastFrame = 0;
-    }
-
-    return count;
-  }
-
-  int calculateRepetition4(double angle) {
-    int count = 0;
-    double angleThresholdMin = 45.0;
-
-    double angleThresholdMax = 150.0;
-
-    String movimentState = "desconhecido";
-
-    if (angle <= angleThresholdMin && angle >= angleThresholdMax) {
-      if (movimentState == "desconhecido") {
-        movimentState = "subindo";
-      } else if (movimentState == "subindo") {
-        movimentState = "subindo";
-      } else if (movimentState == "descendo") {
-        movimentState = "subindo";
-        count++;
-      }
-    } else {
-      if (movimentState == "desconhecido") {
-        movimentState = "descendo";
-      } else if (movimentState == "subindo") {
-        movimentState = "descendo";
-      } else if (movimentState == "descendo") {
-        movimentState = "descendo";
-      }
-    }
-
-    return count;
-  }
-
-  String postSuggestion(double angle) {
-    String suggestion = "";
-    double angleThresholdMin = 50.0;
-
-    double angleThresholdMax = 160.0;
-
-    if (angle < angleThresholdMin) {
-      suggestion = "Subindo";
-    } else if (angle > angleThresholdMax) {
-      suggestion = "Descendo";
-    }
-    return suggestion;
-  }
 
   Widget buildResult() {
     if (_scanResults == null ||
