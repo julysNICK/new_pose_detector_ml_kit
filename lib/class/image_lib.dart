@@ -6,9 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
 class GetImage {
+  final _orientations = {
+    DeviceOrientation.portraitUp: 0,
+    DeviceOrientation.landscapeLeft: 90,
+    DeviceOrientation.portraitDown: 180,
+    DeviceOrientation.landscapeRight: 270,
+  };
   InputImage? getInputImage(
     CameraDescription cameraDescription,
-    Map<DeviceOrientation, int> orientations,
     CameraController? controller,
     CameraImage? img,
   ) {
@@ -19,7 +24,7 @@ class GetImage {
     InputImageRotation? imageRotation;
 
     var rotationCompensation =
-        orientations[controller!.value.deviceOrientation];
+        _orientations[controller!.value.deviceOrientation];
 
     if (rotationCompensation == null) return null;
 

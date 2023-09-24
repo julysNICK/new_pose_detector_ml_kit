@@ -6,7 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
+import 'package:new_pose_test/class/handle_camera.dart';
 import 'package:new_pose_test/class/image_lib.dart';
+import 'package:new_pose_test/class/pose_frame.dart';
 import 'package:new_pose_test/class/slope_track.dart';
 import 'package:new_pose_test/class/class_barbell.dart';
 
@@ -55,12 +57,17 @@ class _MyHomePageState extends State<MyHomePage> {
   double angleWristAndShoulder = 0.0;
   String suggestion = "";
   String slopePosition = "";
+  CameraHandle cameraHandle = CameraHandle();
   int count = 0;
+  bool readyToStart = false;
+
   @override
   void initState() {
     super.initState();
     initializeCamera();
   }
+
+  PoseFrame poseFrame = PoseFrame();
 
   Future<void> initializeCamera() async {
     final options = PoseDetectorOptions(
@@ -98,36 +105,38 @@ class _MyHomePageState extends State<MyHomePage> {
   BarbellExercise barbellExercise = BarbellExercise();
   GetImage getImage = GetImage();
   SlopeTrack slopeTrack = SlopeTrack();
+
   doPoseDetectionOnFrame() async {
-    var frameImg = getImage.getInputImage(
-        cameraDescription, _orientations, controller, img);
+    var frameImg = getImage.getInputImage(cameraDescription, controller, img);
 
     poses = await poseDetection.processImage(frameImg);
 
     for (Pose pose in poses) {
-      double angleC = calculateAngleInBarbellCurls(pose);
+      if (readyToStart == true) {
+        double angleC = calculateAngleInBarbellCurls(pose);
 
-      int count = barbellExercise.calculationRepetition(angleC);
-      // String suggestion = postSuggestion(angleC);
+        int count = barbellExercise.calculationRepetition(angleC);
+        // String suggestion = postSuggestion(angleC);
 
-      double distanceWristAndShoulder =
-          slopeTrack.slopeLineShoulderAndHipWithAngle(
-        pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
-        pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
-        pose.landmarks[PoseLandmarkType.leftHip]!.x,
-        pose.landmarks[PoseLandmarkType.leftHip]!.y,
-      );
+        double distanceWristAndShoulder =
+            slopeTrack.slopeLineShoulderAndHipWithAngle(
+          pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
+          pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
+          pose.landmarks[PoseLandmarkType.leftHip]!.x,
+          pose.landmarks[PoseLandmarkType.leftHip]!.y,
+        );
 
-      String slopePosition =
-          slopeTrack.verifySlopeAngle(distanceWristAndShoulder);
+        String slopePosition =
+            slopeTrack.verifySlopeAngle(distanceWristAndShoulder);
 
-      setState(() {
-        // distanceWristAndShoulder = distanceWristAndShoulder;
-        this.count = count + this.count;
-        suggestion = suggestion;
-        this.slopePosition = slopePosition;
-        // angleWristAndShoulder = distanceWristAndShoulder;
-      });
+        setState(() {
+          // distanceWristAndShoulder = distanceWristAndShoulder;
+          this.count = count + this.count;
+          suggestion = suggestion;
+          this.slopePosition = slopePosition;
+          // angleWristAndShoulder = distanceWristAndShoulder;
+        });
+      }
     }
 
     setState(() {
@@ -287,6 +296,53 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ),
+      );
+
+      stackChildren.add(
+        Positioned(
+          bottom: 0.0,
+          left: 0.0,
+          width: size.width,
+          height: 50.0,
+          child: InkWell(
+            onTap: () {
+              //change readyToStart to true after 5 seconds
+              print("chamei onTap");
+
+              Future.delayed(const Duration(seconds: 5), () {
+                print("chamei Future.delayed");
+                setState(() {
+                  readyToStart = true;
+                });
+              });
+            },
+            child: Container(
+              width: size.width,
+              height: 10.0,
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.5),
+                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black,
+                    spreadRadius: 1,
+                    blurRadius: 1,
+                    offset: Offset(0, 1), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: Text(
+                  "Começar a treinar",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.0,
+                  ),
+                ),
+              ),
             ),
           ),
         ),

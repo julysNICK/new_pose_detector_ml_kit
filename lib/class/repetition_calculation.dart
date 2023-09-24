@@ -23,7 +23,6 @@ class RepetitionCalculation {
   final List<double> angleHistoryApproved = [];
 
   int calculationRepetition(double angle) {
-    print("chamei calculationRepetition");
     manipulationArray.addAngleInArray2(angleHistory, angle, 3);
 
     manipulationArray.verifyArray(angleHistory, historyLength);
