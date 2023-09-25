@@ -8,7 +8,7 @@ class BarbellExercise {
   RepetitionCalculation repetitionCalculation = RepetitionCalculation();
 
   int calculationRepetition(double angle) {
-    print("chamei calculationRepetition");
+    print('angle: $angle');
     return repetitionCalculation.calculationRepetition(angle);
   }
 }

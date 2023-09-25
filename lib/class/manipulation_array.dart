@@ -1,11 +1,24 @@
 class ManipulationArray {
-  void addAngleInArray2(List<double> angleArray, double angle, double diff) {
+  void addAngleInArray2(
+      List<double> angleArray,
+      double angle,
+      double diff,
+      double limitHigherFall,
+      double limitLowerFall,
+      double limitHigherRise,
+      double limitLowerRise) {
     double? theLastAngle = angleArray.isNotEmpty ? angleArray.last : null;
     int roundedAngle = angle.round();
 
-    var inBetweenInFall = (roundedAngle >= 130 && roundedAngle <= 141);
+//     var inBetweenInFall = (roundedAngle >= 130 && roundedAngle <= 141);
+// //50-> 70
+//     var inBetweenRise = (roundedAngle >= 70 && roundedAngle < 130);
+
+    var inBetweenInFall =
+        (roundedAngle >= limitLowerFall && roundedAngle <= limitHigherFall);
 //50-> 70
-    var inBetweenRise = (roundedAngle >= 70 && roundedAngle < 130);
+    var inBetweenRise =
+        (roundedAngle >= limitLowerFall && roundedAngle < limitHigherRise);
     if (theLastAngle == null && inBetweenInFall) {
       angleArray.add(angle.roundToDouble());
     } else if (theLastAngle != null &&
@@ -23,10 +36,10 @@ class ManipulationArray {
     }
   }
 
-  void verifyArray(List<double> angleArray, int length) {
+  void verifyArray(List<double> angleArray, int length, double limitToAccept) {
     if (angleArray.isNotEmpty) {
       double? theLastAngle = angleArray.last; //60-> 80
-      if (angleArray.length == length && theLastAngle > 80) {
+      if (angleArray.length == length && theLastAngle > limitToAccept) {
         angleArray.removeAt(0);
       }
     }

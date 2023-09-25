@@ -1,12 +1,14 @@
+import 'package:new_pose_test/main.dart';
+
 class AngleVerifier {
   int verifyAngle(angleHistory, angleThresholdMin, angleThresholdMax,
-      historyLength, angleHistoryApproved) {
+      historyLength, angleHistoryApproved, limitAccept) {
     bool isAngleInRange = angleHistory.every((a) =>
         a.round() >= angleThresholdMin && a.round() <= angleThresholdMax);
 
     if (angleHistory.length == historyLength &&
         isAngleInRange &&
-        angleHistory.last <= 80) {
+        angleHistory.last <= limitAccept) {
       //70 -> 75
       angleHistoryApproved.addAll(angleHistory);
       angleHistory.clear();
