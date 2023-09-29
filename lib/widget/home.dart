@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     for (Pose pose in poses) {
       if (readyToStart == true) {
-        double angleC = calculateAngleInBarbellCurls(pose);
+        double angleC = calculateAngleInSquat(pose);
 
         int count = barbellExercise.calculationRepetition(angleC);
         // String suggestion = postSuggestion(angleC);
@@ -162,6 +162,17 @@ class _MyHomePageState extends State<MyHomePage> {
     final PoseLandmark elbow = pose.landmarks[PoseLandmarkType.leftElbow]!;
 
     final double angle = getAngle(wrist, elbow, shoulder);
+
+    return angle;
+  }
+
+  double calculateAngleInSquat(Pose pose) {
+    final PoseLandmark hip = pose.landmarks[PoseLandmarkType.leftHip]!;
+    final PoseLandmark ankle = pose.landmarks[PoseLandmarkType.leftAnkle]!;
+
+    final PoseLandmark knee = pose.landmarks[PoseLandmarkType.leftKnee]!;
+
+    final double angle = getAngle(hip, knee, ankle);
 
     return angle;
   }
@@ -393,14 +404,14 @@ class PosePainter extends CustomPainter {
       }
 
       //Draw arms
-      paintLine(
-          PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, leftPaint);
-      paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow,
-          rightPaint);
-      paintLine(
-          PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist, rightPaint);
+      // paintLine(
+      //     PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, leftPaint);
+      // paintLine(
+      //     PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, leftPaint);
+      // paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow,
+      //     rightPaint);
+      // paintLine(
+      //     PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist, rightPaint);
 
       //Draw Body
       paintLine(
@@ -410,31 +421,31 @@ class PosePainter extends CustomPainter {
 
       //Draw legs
       paintLine(PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee, leftPaint);
-      // paintLine(
-      //     PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, leftPaint);
+      paintLine(
+          PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, leftPaint);
       paintLine(
           PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee, rightPaint);
+      paintLine(
+          PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, rightPaint);
+
       // paintLine(
-      //     PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, rightPaint);
+      //     PoseLandmarkType.leftWrist, PoseLandmarkType.leftThumb, leftPaint);
 
-      paintLine(
-          PoseLandmarkType.leftWrist, PoseLandmarkType.leftThumb, leftPaint);
+      // paintLine(
+      //     PoseLandmarkType.leftWrist, PoseLandmarkType.leftPinky, leftPaint);
 
-      paintLine(
-          PoseLandmarkType.leftWrist, PoseLandmarkType.leftPinky, leftPaint);
-
-      paintLine(
-          PoseLandmarkType.leftWrist, PoseLandmarkType.leftIndex, leftPaint);
+      // paintLine(
+      //     PoseLandmarkType.leftWrist, PoseLandmarkType.leftIndex, leftPaint);
 
       //Draw legs
-      paintLine(
-          PoseLandmarkType.rightWrist, PoseLandmarkType.rightThumb, rightPaint);
+      // paintLine(
+      //     PoseLandmarkType.rightWrist, PoseLandmarkType.rightThumb, rightPaint);
 
-      paintLine(
-          PoseLandmarkType.rightWrist, PoseLandmarkType.rightPinky, rightPaint);
+      // paintLine(
+      //     PoseLandmarkType.rightWrist, PoseLandmarkType.rightPinky, rightPaint);
 
-      paintLine(
-          PoseLandmarkType.rightWrist, PoseLandmarkType.rightIndex, rightPaint);
+      // paintLine(
+      //     PoseLandmarkType.rightWrist, PoseLandmarkType.rightIndex, rightPaint);
     }
   }
 
