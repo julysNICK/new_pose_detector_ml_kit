@@ -18,7 +18,7 @@ class ManipulationArray {
         (roundedAngle >= limitLowerFall && roundedAngle <= limitHigherFall);
 //50-> 70
     var inBetweenRise =
-        (roundedAngle >= limitLowerFall && roundedAngle < limitHigherRise);
+        (roundedAngle >= limitLowerRise && roundedAngle < limitHigherRise);
     if (theLastAngle == null && inBetweenInFall) {
       angleArray.add(angle.roundToDouble());
     } else if (theLastAngle != null &&
