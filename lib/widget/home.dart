@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
+import 'package:new_pose_test/class/class_squat.dart';
 import 'package:new_pose_test/class/handle_camera.dart';
 import 'package:new_pose_test/class/image_lib.dart';
 import 'package:new_pose_test/class/pose_frame.dart';
@@ -96,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
   CameraImage? img;
   bool isRepeting = false;
   BarbellExercise barbellExercise = BarbellExercise();
+  SquatExercise squatExercise = SquatExercise();
   GetImage getImage = GetImage();
   SlopeTrack slopeTrack = SlopeTrack();
 
@@ -108,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (readyToStart == true) {
         double angleC = calculateAngleInSquat(pose);
 
-        int count = barbellExercise.calculationRepetition(angleC);
+        int count = squatExercise.calculationRepetition(angleC);
         // String suggestion = postSuggestion(angleC);
 
         double distanceWristAndShoulder =
@@ -244,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 Text(
-                  "Angle Barbell: $angleBarbell",
+                  "Angle deep: $angleBarbell",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20.0,

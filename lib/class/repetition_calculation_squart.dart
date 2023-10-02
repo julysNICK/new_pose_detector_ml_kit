@@ -1,22 +1,22 @@
 import 'package:new_pose_test/class/angle_verifier.dart';
 import 'package:new_pose_test/class/manipulation_array.dart';
 
-const double squatLimit = 80;
+const double squatLimit = 125;
 
-const double limitHigherFallSquat = 141;
+const double limitHigherFallSquat = 175;
 
-const double limitLowerFallSquat = 130;
+const double limitLowerFallSquat = 150;
 
-const double limitHigherSquat = 130;
+const double limitHigherSquat = 150;
 
-const double limitLowerRiseSquat = 70;
+const double limitLowerRiseSquat = 120;
 
 class RepetitionCalculationSquat {
   int historyLength = 3;
 
-  double angleThresholdMin = 50.0;
+  double angleThresholdMin = 120.0;
 
-  double angleThresholdMax = 140.0;
+  double angleThresholdMax = 175.0;
 
   ManipulationArray manipulationArray = ManipulationArray();
 
@@ -24,8 +24,8 @@ class RepetitionCalculationSquat {
 
   RepetitionCalculationSquat({
     this.historyLength = 3,
-    this.angleThresholdMin = 50.0,
-    this.angleThresholdMax = 140.0,
+    this.angleThresholdMin = 120.0,
+    this.angleThresholdMax = 175.0,
   });
 
   final List<double> angleHistory = [];
