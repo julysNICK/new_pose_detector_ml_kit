@@ -10,6 +10,6 @@ class SquatExercise {
 
   int calculationRepetition(double angle) {
     print('angle: $angle');
-    return repetitionCalculation.calculationRepetition(angle);
+    return repetitionCalculation.calculationRepetition(angle.roundToDouble());
   }
 }

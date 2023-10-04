@@ -1,4 +1,49 @@
 class ManipulationArray {
+  bool isInBetweenInFall(
+      int roundedAngle, double limitHigherFall, double limitLowerFall) {
+    return (roundedAngle >= limitLowerFall && roundedAngle <= limitHigherFall);
+  }
+
+  bool isInBetweenRise(
+      int roundedAngle, double limitHigherRise, double limitLowerRise) {
+    return (roundedAngle >= limitLowerRise && roundedAngle < limitHigherRise);
+  }
+
+  bool shouldAddAngleToArray(
+    double angle,
+    double? theLastAngle,
+    double diff,
+    double limitHigherFallSquat,
+    double limitLowerFallSquat,
+    double limitHigherSquat,
+    double limitLowerRiseSquat,
+  ) {
+    if (theLastAngle == null &&
+        isInBetweenInFall(
+            angle.round(), limitHigherFallSquat, limitLowerFallSquat)) {
+      return true;
+    } else if (theLastAngle != null &&
+        isInBetweenInFall(
+            angle.round(), limitHigherFallSquat, limitLowerFallSquat) &&
+        angle < theLastAngle) {
+      double diffAngle = theLastAngle - angle;
+
+      if (diffAngle >= diff) {
+        return true;
+      }
+    } else if (theLastAngle != null &&
+        isInBetweenRise(angle.round(), limitHigherSquat, limitLowerRiseSquat) &&
+        angle < theLastAngle) {
+      double diffAngle = angle - theLastAngle;
+
+      if (diffAngle.abs() >= diff) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   void addAngleInArray2(
       List<double> angleArray,
       double angle,
@@ -7,32 +52,16 @@ class ManipulationArray {
       double limitLowerFall,
       double limitHigherRise,
       double limitLowerRise) {
-    double? theLastAngle = angleArray.isNotEmpty ? angleArray.last : null;
-    int roundedAngle = angle.round();
-
-//     var inBetweenInFall = (roundedAngle >= 130 && roundedAngle <= 141);
-// //50-> 70
-//     var inBetweenRise = (roundedAngle >= 70 && roundedAngle < 130);
-
-    var inBetweenInFall =
-        (roundedAngle >= limitLowerFall && roundedAngle <= limitHigherFall);
-//50-> 70
-    var inBetweenRise =
-        (roundedAngle >= limitLowerRise && roundedAngle < limitHigherRise);
-    if (theLastAngle == null && inBetweenInFall) {
-      angleArray.add(angle.roundToDouble());
-    } else if (theLastAngle != null &&
-        inBetweenInFall &&
-        angle < theLastAngle) {
-      double diffAngle = theLastAngle - angle;
-      if (diffAngle > diff) {
-        angleArray.add(angle);
-      }
-    } else if (theLastAngle != null && inBetweenRise && angle < theLastAngle) {
-      double diffAngle = angle - theLastAngle;
-      if (diffAngle.abs() > diff) {
-        angleArray.add(angle);
-      }
+    if (shouldAddAngleToArray(
+        angle,
+        angleArray.isNotEmpty ? angleArray.last : null,
+        diff,
+        limitHigherFall,
+        limitLowerFall,
+        limitHigherRise,
+        limitLowerRise)) {
+      angleArray.add(angle);
+      print('angleArray: $angleArray');
     }
   }
 
