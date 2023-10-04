@@ -1,4 +1,26 @@
+class AngleArrayAdder {
+  void addAngleToArray(List<double> angleArray, double angle) {
+    angleArray.add(angle);
+  }
+}
+
+class AngleArrayVerifier {
+  bool verifyAngleArray(
+      List<double> angleArray, int length, double limitToAccept) {
+    if (angleArray.isNotEmpty) {
+      double? theLastAngle = angleArray.last;
+      if (angleArray.length == length && theLastAngle > limitToAccept) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
 class ManipulationArray {
+  final AngleArrayAdder angleArrayAdder = AngleArrayAdder();
+  final AngleArrayVerifier angleArrayVerifier = AngleArrayVerifier();
+
   bool isInBetweenInFall(
       int roundedAngle, double limitHigherFall, double limitLowerFall) {
     return (roundedAngle >= limitLowerFall && roundedAngle <= limitHigherFall);
@@ -60,17 +82,14 @@ class ManipulationArray {
         limitLowerFall,
         limitHigherRise,
         limitLowerRise)) {
-      angleArray.add(angle);
-      print('angleArray: $angleArray');
+      angleArrayAdder.addAngleToArray(angleArray, angle);
     }
   }
 
   void verifyArray(List<double> angleArray, int length, double limitToAccept) {
-    if (angleArray.isNotEmpty) {
-      double? theLastAngle = angleArray.last; //60-> 80
-      if (angleArray.length == length && theLastAngle > limitToAccept) {
-        angleArray.removeAt(0);
-      }
+    if (angleArrayVerifier.verifyAngleArray(
+        angleArray, length, limitToAccept)) {
+      angleArray.removeAt(0);
     }
   }
 }
