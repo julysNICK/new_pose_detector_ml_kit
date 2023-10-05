@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:new_pose_test/class/calculate_angle.dart';
+import 'package:new_pose_test/class/class_arm_flexion.dart';
 import 'package:new_pose_test/class/class_squat.dart';
+import 'package:new_pose_test/class/exercise.dart';
 import 'package:new_pose_test/class/handle_camera.dart';
 import 'package:new_pose_test/class/image_lib.dart';
 import 'package:new_pose_test/class/pose_frame.dart';
@@ -98,11 +100,15 @@ class _MyHomePageState extends State<MyHomePage> {
   dynamic _scanResults;
   CameraImage? img;
   bool isRepeting = false;
-  BarbellExercise barbellExercise = BarbellExercise();
-  SquatExercise squatExercise = SquatExercise();
   GetImage getImage = GetImage();
+  // BarbellExercise barbellExercise = BarbellExercise();
+  // SquatExercise squatExercise = SquatExercise();
   SlopeTrack slopeTrack = SlopeTrack();
   CalculateAngle calculateAngle = CalculateAngle();
+
+  final Exercise _babelExercise = BarbellExercise().createExercise();
+  final Exercise _squatExercise = SquatExercise().createExercise();
+  final Exercise _armFlexionExercise = ArmFlexionExercise().createExercise();
 
   doPoseDetectionOnFrame() async {
     var frameImg = getImage.getInputImage(cameraDescription, controller, img);
@@ -113,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (readyToStart == true) {
         double angleC = calculateAngle.calculateAngleInSquat(pose);
 
-        int count = squatExercise.calculationRepetition(angleC);
+        int count = _squatExercise.calculationRepetition(angleC);
         // String suggestion = postSuggestion(angleC);
 
         double distanceWristAndShoulder =
