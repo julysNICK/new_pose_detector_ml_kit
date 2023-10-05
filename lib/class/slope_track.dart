@@ -1,15 +1,9 @@
 import 'dart:math';
 
-class SlopeTrack {
+class SLopeVerifier {
   final List<double> angleHistorySlope = [];
 
   String result = "";
-  double slopeLineShoulderAndHipWithAngle(
-      double xShoulder, double yShoulder, double xHip, double yHip) {
-    double angle = atan2(yHip - yShoulder, xHip - xShoulder);
-
-    return angle;
-  }
 
   verifySlopeAngle(double angle) {
     angleHistorySlope.add(angle);
@@ -30,5 +24,25 @@ class SlopeTrack {
     }
 
     return result;
+  }
+}
+
+class AngleCalculator {
+  double slopeLine(double x1, double y1, double x2, double y2) {
+    double angle = atan2(y2 - y1, x2 - x1);
+    return angle;
+  }
+}
+
+class SlopeTrack {
+  final AngleCalculator angleCalculator = AngleCalculator();
+  final SLopeVerifier slopeVerifier = SLopeVerifier();
+
+  SlopeTrack();
+
+  verifySlopeAngle(
+      double xShoulder, double yShoulder, double xHip, double yHip) {
+    double angle = angleCalculator.slopeLine(xShoulder, yShoulder, xHip, yHip);
+    return slopeVerifier.verifySlopeAngle(angle);
   }
 }

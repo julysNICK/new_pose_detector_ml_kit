@@ -101,8 +101,6 @@ class _MyHomePageState extends State<MyHomePage> {
   CameraImage? img;
   bool isRepeting = false;
   GetImage getImage = GetImage();
-  // BarbellExercise barbellExercise = BarbellExercise();
-  // SquatExercise squatExercise = SquatExercise();
   SlopeTrack slopeTrack = SlopeTrack();
   CalculateAngle calculateAngle = CalculateAngle();
 
@@ -122,16 +120,12 @@ class _MyHomePageState extends State<MyHomePage> {
         int count = _squatExercise.calculationRepetition(angleC);
         // String suggestion = postSuggestion(angleC);
 
-        double distanceWristAndShoulder =
-            slopeTrack.slopeLineShoulderAndHipWithAngle(
+        String slopePosition = slopeTrack.verifySlopeAngle(
           pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
           pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
           pose.landmarks[PoseLandmarkType.leftHip]!.x,
           pose.landmarks[PoseLandmarkType.leftHip]!.y,
         );
-
-        String slopePosition =
-            slopeTrack.verifySlopeAngle(distanceWristAndShoulder);
 
         setState(() {
           // distanceWristAndShoulder = distanceWristAndShoulder;
