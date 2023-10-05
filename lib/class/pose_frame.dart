@@ -51,18 +51,13 @@ class PoseFrame {
       double angleC = calculateAngleInBarbellCurls(pose);
 
       int countFunc = barbellExercise.calculationRepetition(angleC);
-      // String suggestion = postSuggestion(angleC);
 
-      double distanceWristAndShoulder =
-          slopeTrack.slopeLineShoulderAndHipWithAngle(
+      String slopePosition = slopeTrack.verifySlopeAngle(
         pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
         pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
         pose.landmarks[PoseLandmarkType.leftHip]!.x,
         pose.landmarks[PoseLandmarkType.leftHip]!.y,
       );
-
-      String slopePosition =
-          slopeTrack.verifySlopeAngle(distanceWristAndShoulder);
 
       setState(() {
         // distanceWristAndShoulder = distanceWristAndShoulder;
