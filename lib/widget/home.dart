@@ -19,6 +19,22 @@ import 'package:new_pose_test/widget/pose_painter.dart';
 
 late List<CameraDescription> cameras;
 
+class _MyHomePageStateData {
+  late dynamic controller;
+  late dynamic poseDetection;
+  late SlopeTrack slopeTrack;
+
+  _MyHomePageStateData({
+    required this.poseDetection,
+    required this.controller,
+    required this.slopeTrack,
+  });
+
+  void dispose() {
+    controller.dispose();
+  }
+}
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -29,9 +45,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  dynamic controller;
   bool isBusy = false;
-  dynamic poseDetection = false;
+
   late CameraDescription cameraDescription;
   CameraLensDirection cameraLensDirection = CameraLensDirection.front;
   List<Pose> poses = <Pose>[];
@@ -42,18 +57,26 @@ class _MyHomePageState extends State<MyHomePage> {
   CameraHandle cameraHandle = CameraHandle();
   int count = 0;
   bool readyToStart = false;
+  bool isAboveThreshold = false;
+  bool hasCompletedRepetition = false;
+  late _MyHomePageStateData _data;
+  dynamic _scanResults;
+  CameraImage? img;
+  bool isRepeting = false;
+  GetImage getImage = GetImage();
+  CalculateAngle calculateAngle = CalculateAngle();
+
+  final Exercise _babelExercise = BarbellExercise().createExercise();
+  final Exercise _squatExercise = SquatExercise().createExercise();
+  final Exercise _armFlexionExercise = ArmFlexionExercise().createExercise();
 
   Future initCamera() async {
     try {
-      print("chamei initCamera");
       cameras = await availableCameras();
       cameraDescription = cameras[1];
       cameraLensDirection = CameraLensDirection.front;
-      print("cameraDescription: $cameraDescription");
-      print("deu certo");
       initializeCamera();
     } catch (e) {
-      print("deu erro");
       print(e);
     }
   }
@@ -61,8 +84,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-
     initCamera();
+    _data = _MyHomePageStateData(
+      controller: cameraHandle.controller,
+      poseDetection: false,
+      slopeTrack: SlopeTrack(),
+    );
   }
 
   PoseFrame poseFrame = PoseFrame();
@@ -72,9 +99,9 @@ class _MyHomePageState extends State<MyHomePage> {
       mode: PoseDetectionMode.stream,
     );
 
-    poseDetection = PoseDetector(options: options);
+    _data.poseDetection = PoseDetector(options: options);
 
-    controller = CameraController(
+    _data.controller = CameraController(
       cameraDescription,
       ResolutionPreset.max,
       enableAudio: false,
@@ -83,11 +110,11 @@ class _MyHomePageState extends State<MyHomePage> {
           : ImageFormatGroup.bgra8888,
     );
 
-    await controller.initialize().then((_) {
+    await _data.controller.initialize().then((_) {
       if (!mounted) {
         return;
       }
-      controller.startImageStream((CameraImage image) async {
+      _data.controller.startImageStream((CameraImage image) async {
         if (!isBusy) {
           isBusy = true;
           img = image;
@@ -97,21 +124,11 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  dynamic _scanResults;
-  CameraImage? img;
-  bool isRepeting = false;
-  GetImage getImage = GetImage();
-  SlopeTrack slopeTrack = SlopeTrack();
-  CalculateAngle calculateAngle = CalculateAngle();
-
-  final Exercise _babelExercise = BarbellExercise().createExercise();
-  final Exercise _squatExercise = SquatExercise().createExercise();
-  final Exercise _armFlexionExercise = ArmFlexionExercise().createExercise();
-
   doPoseDetectionOnFrame() async {
-    var frameImg = getImage.getInputImage(cameraDescription, controller, img);
+    var frameImg =
+        getImage.getInputImage(cameraDescription, _data.controller, img);
 
-    poses = await poseDetection.processImage(frameImg);
+    poses = await _data.poseDetection.processImage(frameImg);
 
     for (Pose pose in poses) {
       if (readyToStart == true) {
@@ -120,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
         int count = _squatExercise.calculationRepetition(angleC);
         // String suggestion = postSuggestion(angleC);
 
-        String slopePosition = slopeTrack.verifySlopeAngle(
+        String slopePosition = _data.slopeTrack.verifySlopeAngle(
           pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
           pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
           pose.landmarks[PoseLandmarkType.leftHip]!.x,
@@ -143,19 +160,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  bool isAboveThreshold = false;
-  bool hasCompletedRepetition = false;
-
   Widget buildResult() {
-    if (_scanResults == null ||
-        controller == null ||
-        !controller.value.isInitialized) {
+    if (_scanResults == null || !_data.controller.value.isInitialized) {
       return const Text('');
     }
 
     final Size imageSize = Size(
-      controller.value.previewSize!.height,
-      controller.value.previewSize!.width,
+      _data.controller.value.previewSize!.height,
+      _data.controller.value.previewSize!.width,
     );
     CustomPainter painter =
         PosePainter(imageSize, _scanResults, cameraLensDirection);
@@ -168,114 +180,123 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     List<Widget> stackChildren = [];
     final size = MediaQuery.of(context).size;
-    if (controller != null) {
-      stackChildren.add(
-        Positioned(
+    stackChildren.add(
+      Positioned(
+        top: 0.0,
+        left: 0.0,
+        width: size.width,
+        height: size.height,
+        child: Container(
+            child: (_data.controller.value.isInitialized)
+                ? Container(
+                    child: CameraPreview(_data.controller),
+                  )
+                : _data.controller.value == null
+                    ? Container(
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'Initializing Camera...',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.0,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : Container()),
+      ),
+    );
+    stackChildren.add(
+      Positioned(
           top: 0.0,
           left: 0.0,
           width: size.width,
           height: size.height,
-          child: Container(
-            child: (controller.value.isInitialized)
-                ? Container(
-                    child: CameraPreview(controller),
-                  )
-                : Container(),
+          child: buildResult()),
+    );
+
+    stackChildren.add(
+      Positioned(
+        top: 0.0,
+        left: 0.0,
+        width: size.width,
+        height: size.height,
+        child: Container(
+          child: Column(
+            children: [
+              Text(
+                "Repetition: $count",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                ),
+              ),
+              Text(
+                "Angle flexion Arm: $angleBarbell",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                ),
+              ),
+              Text(
+                "Slope Position: $slopePosition",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                ),
+              ),
+            ],
           ),
         ),
-      );
-      stackChildren.add(
-        Positioned(
-            top: 0.0,
-            left: 0.0,
-            width: size.width,
-            height: size.height,
-            child: buildResult()),
-      );
+      ),
+    );
 
-      stackChildren.add(
-        Positioned(
-          top: 0.0,
-          left: 0.0,
-          width: size.width,
-          height: size.height,
+    stackChildren.add(
+      Positioned(
+        bottom: 0.0,
+        left: 0.0,
+        width: size.width,
+        height: 50.0,
+        child: InkWell(
+          onTap: () {
+            //change readyToStart to true after 5 seconds
+            print("chamei onTap");
+
+            Future.delayed(const Duration(seconds: 5), () {
+              print("chamei Future.delayed");
+              setState(() {
+                readyToStart = true;
+              });
+            });
+          },
           child: Container(
-            child: Column(
-              children: [
-                Text(
-                  "Repetition: $count",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                  ),
-                ),
-                Text(
-                  "Angle flexion Arm: $angleBarbell",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                  ),
-                ),
-                Text(
-                  "Slope Position: $slopePosition",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                  ),
+            width: size.width,
+            height: 10.0,
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.5),
+              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black,
+                  spreadRadius: 1,
+                  blurRadius: 1,
+                  offset: Offset(0, 1), // changes position of shadow
                 ),
               ],
             ),
-          ),
-        ),
-      );
-
-      stackChildren.add(
-        Positioned(
-          bottom: 0.0,
-          left: 0.0,
-          width: size.width,
-          height: 50.0,
-          child: InkWell(
-            onTap: () {
-              //change readyToStart to true after 5 seconds
-              print("chamei onTap");
-
-              Future.delayed(const Duration(seconds: 5), () {
-                print("chamei Future.delayed");
-                setState(() {
-                  readyToStart = true;
-                });
-              });
-            },
-            child: Container(
-              width: size.width,
-              height: 10.0,
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.5),
-                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black,
-                    spreadRadius: 1,
-                    blurRadius: 1,
-                    offset: Offset(0, 1), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: const Center(
-                child: Text(
-                  "Começar a treinar",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                  ),
+            child: const Center(
+              child: Text(
+                "Começar a treinar",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
                 ),
               ),
             ),
           ),
         ),
-      );
-    }
+      ),
+    );
 
     return Scaffold(
       appBar: AppBar(
