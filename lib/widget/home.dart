@@ -115,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     for (Pose pose in poses) {
       if (readyToStart == true) {
-        double angleC = calculateAngle.calculateAngleInSquat(pose);
+        double angleC = calculateAngle.calculateAngleInArmFlexion(pose);
 
         int count = _squatExercise.calculationRepetition(angleC);
         // String suggestion = postSuggestion(angleC);
@@ -210,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 Text(
-                  "Angle deep: $angleBarbell",
+                  "Angle flexion Arm: $angleBarbell",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20.0,

@@ -34,8 +34,9 @@ class AngleVerifier {
 
   int verifyAngle(angleHistory, angleThresholdMin, angleThresholdMax,
       historyLength, angleHistoryApproved, limitAccept) {
+    print("angleHistory $angleHistory");
     print(
-        "verifyLengthArray(5, angleHistory) $verifyLengthArray(5, angleHistory)");
+        "verifyLengthArray(5, angleHistory) ${verifyLengthArray(angleHistory)}");
 
     bool isAngleInRange = angleArrayValueVerifier.verifyAngleArray(
         angleHistory, angleThresholdMin, angleThresholdMax);

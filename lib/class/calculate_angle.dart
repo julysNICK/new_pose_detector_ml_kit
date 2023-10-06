@@ -3,18 +3,6 @@ import 'dart:math';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
 class CalculateAngle {
-  final CalculateAngle _instance = CalculateAngle._internal();
-  static CalculateAngle singleton = CalculateAngle();
-
-  factory CalculateAngle() => singleton;
-
-  CalculateAngle._internal();
-
-  static CalculateAngle get instance {
-    singleton ??= CalculateAngle();
-    return singleton;
-  }
-
   getAngle(
       PoseLandmark firstPoint, PoseLandmark midPoint, PoseLandmark lastPoint) {
     double result = atan2(lastPoint.y - midPoint.y, lastPoint.x - midPoint.x) -
@@ -51,9 +39,9 @@ class CalculateAngle {
     final elbowPositionLeft = pos.landmarks[PoseLandmarkType.leftElbow]!;
     final shoulderPositionLeft = pos.landmarks[PoseLandmarkType.leftShoulder]!;
     final headPositionLeft = pos.landmarks[PoseLandmarkType.nose]!;
-
+    // final wristPositionLeft = pos.landmarks[PoseLandmarkType.leftWrist]!;
     final shoulderAngle =
-        getAngle(elbowPositionLeft, shoulderPositionLeft, headPositionLeft);
+        getAngle(shoulderPositionLeft, elbowPositionLeft, headPositionLeft);
     return shoulderAngle;
   }
 }
