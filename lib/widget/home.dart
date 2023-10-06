@@ -45,22 +45,21 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool isBusy = false;
-
-  late CameraDescription cameraDescription;
-  CameraLensDirection cameraLensDirection = CameraLensDirection.front;
   List<Pose> poses = <Pose>[];
+  bool readyToStart = false;
   double distanceWristAndShoulder = 0.0;
   double angleBarbell = 0.0;
+  bool isBusy = false;
+  CameraLensDirection cameraLensDirection = CameraLensDirection.front;
+  late CameraDescription cameraDescription;
   String suggestion = "";
   String slopePosition = "";
   CameraHandle cameraHandle = CameraHandle();
   int count = 0;
-  bool readyToStart = false;
-  bool isAboveThreshold = false;
-  bool hasCompletedRepetition = false;
-  late _MyHomePageStateData _data;
   dynamic _scanResults;
+  //in use
+
+  late _MyHomePageStateData _data;
   CameraImage? img;
   bool isRepeting = false;
   GetImage getImage = GetImage();
@@ -124,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  doPoseDetectionOnFrame() async {
+  _updatePoseState() async {
     var frameImg =
         getImage.getInputImage(cameraDescription, _data.controller, img);
 
@@ -160,6 +159,10 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  doPoseDetectionOnFrame() async {
+    await _updatePoseState();
+  }
+
   Widget buildResult() {
     if (_scanResults == null || !_data.controller.value.isInitialized) {
       return const Text('');
@@ -176,6 +179,76 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buidExercice() {
+    return Container(
+      child: Column(
+        children: [
+          Text(
+            "Repetition: $count",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20.0,
+            ),
+          ),
+          Text(
+            "Angle flexion Arm: $angleBarbell",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20.0,
+            ),
+          ),
+          Text(
+            "Slope Position: $slopePosition",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIfCameraInit() {
+    return Container(
+      child: (_data.controller.value.isInitialized)
+          ? Container(
+              child: CameraPreview(_data.controller),
+            )
+          : _data.controller.value == null
+              ? Container(
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Initializing Camera...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : Container(),
+    );
+  }
+
+  final BoxDecoration _decorationText = BoxDecoration(
+    color: Colors.blue.withOpacity(0.5),
+    borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+    boxShadow: const [
+      BoxShadow(
+        color: Colors.black,
+        spreadRadius: 1,
+        blurRadius: 1,
+        offset: Offset(0, 1), // changes position of shadow
+      ),
+    ],
+  );
+
+  final TextStyle _stylesText = const TextStyle(
+    color: Colors.white,
+    fontSize: 20.0,
+  );
+
   @override
   Widget build(BuildContext context) {
     List<Widget> stackChildren = [];
@@ -186,24 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
         left: 0.0,
         width: size.width,
         height: size.height,
-        child: Container(
-            child: (_data.controller.value.isInitialized)
-                ? Container(
-                    child: CameraPreview(_data.controller),
-                  )
-                : _data.controller.value == null
-                    ? Container(
-                        alignment: Alignment.center,
-                        child: const Text(
-                          'Initializing Camera...',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      )
-                    : Container()),
+        child: _buildIfCameraInit(),
       ),
     );
     stackChildren.add(
@@ -221,33 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
         left: 0.0,
         width: size.width,
         height: size.height,
-        child: Container(
-          child: Column(
-            children: [
-              Text(
-                "Repetition: $count",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.0,
-                ),
-              ),
-              Text(
-                "Angle flexion Arm: $angleBarbell",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.0,
-                ),
-              ),
-              Text(
-                "Slope Position: $slopePosition",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.0,
-                ),
-              ),
-            ],
-          ),
-        ),
+        child: _buidExercice(),
       ),
     );
 
@@ -272,25 +302,11 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Container(
             width: size.width,
             height: 10.0,
-            decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.5),
-              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black,
-                  spreadRadius: 1,
-                  blurRadius: 1,
-                  offset: Offset(0, 1), // changes position of shadow
-                ),
-              ],
-            ),
-            child: const Center(
+            decoration: _decorationText,
+            child: Center(
               child: Text(
                 "Começar a treinar",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.0,
-                ),
+                style: _stylesText,
               ),
             ),
           ),
@@ -310,14 +326,6 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Stack(
             children: stackChildren,
           )),
-      //   child: Container(
-      //     child: (controller.value.isInitialized)
-      //         ? Container(
-      //             child: CameraPreview(controller),
-      //           )
-      //         : Container(),
-      //   ),
-      // ),
     );
   }
 }
