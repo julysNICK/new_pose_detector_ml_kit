@@ -11,7 +11,7 @@ const double limitHigherSquat = 150;
 
 const double limitLowerRiseSquat = 120;
 
-class RepetitionCalculationSquatFront {
+class RepetitionCalculationSquatSide {
   int historyLength = 5;
 
   double angleThresholdMin = 120.0;
@@ -22,7 +22,7 @@ class RepetitionCalculationSquatFront {
 
   AngleVerifier angleVerifier = AngleVerifier();
 
-  RepetitionCalculationSquatFront({
+  RepetitionCalculationSquatSide({
     this.historyLength = 5,
     this.angleThresholdMin = 120.0,
     this.angleThresholdMax = 175.0,

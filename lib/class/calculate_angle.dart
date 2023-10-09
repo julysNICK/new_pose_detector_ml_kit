@@ -39,9 +39,16 @@ class CalculateAngle {
     final elbowPositionLeft = pos.landmarks[PoseLandmarkType.leftElbow]!;
     final shoulderPositionLeft = pos.landmarks[PoseLandmarkType.leftShoulder]!;
     final headPositionLeft = pos.landmarks[PoseLandmarkType.nose]!;
-    // final wristPositionLeft = pos.landmarks[PoseLandmarkType.leftWrist]!;
-    final shoulderAngle =
-        getAngle(shoulderPositionLeft, elbowPositionLeft, headPositionLeft);
-    return shoulderAngle;
+    final wristPositionLeft = pos.landmarks[PoseLandmarkType.leftWrist]!;
+    // final shoulderAngle =
+    //     getAngle(shoulderPositionLeft, elbowPositionLeft, headPositionLeft);
+
+    // final shoulderAngle1 = getAngle(headPositionLeft, shoulderPositionLeft,
+    //     elbowPositionLeft); //gostei desse
+
+    final shoulderAngle2 =
+        getAngle(shoulderPositionLeft, elbowPositionLeft, wristPositionLeft);
+
+    return shoulderAngle2;
   }
 }

@@ -6,7 +6,8 @@ import 'package:new_pose_test/class/repetition_calculation.dart';
 class BarbellExercise implements Exercise {
   BarbellExercise();
 
-  RepetitionCalculation repetitionCalculation = RepetitionCalculation();
+  RepetitionCalculationBarbelSide repetitionCalculation =
+      RepetitionCalculationBarbelSide();
 
   @override
   int calculationRepetition(double angle) {

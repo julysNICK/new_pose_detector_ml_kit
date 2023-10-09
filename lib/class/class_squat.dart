@@ -6,8 +6,8 @@ import 'package:new_pose_test/class/repetition_calculation_squart.dart';
 class SquatExercise implements Exercise {
   SquatExercise();
 
-  RepetitionCalculationSquat repetitionCalculation =
-      RepetitionCalculationSquat();
+  RepetitionCalculationSquatFront repetitionCalculation =
+      RepetitionCalculationSquatFront();
 
   @override
   int calculationRepetition(double angle) {

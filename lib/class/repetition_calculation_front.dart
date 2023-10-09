@@ -11,7 +11,7 @@ const double limitHigherRiseBarbell = 130;
 
 const double limitLowerRiseBarbell = 70;
 
-class RepetitionCalculationBarbelSide {
+class RepetitionCalculationBarbelFront {
   int historyLength = 3;
 
   double angleThresholdMin = 50.0;
@@ -22,7 +22,7 @@ class RepetitionCalculationBarbelSide {
 
   AngleVerifier angleVerifier = AngleVerifier();
 
-  RepetitionCalculationBarbelSide({
+  RepetitionCalculationBarbelFront({
     this.historyLength = 3,
     this.angleThresholdMin = 50.0,
     this.angleThresholdMax = 140.0,
