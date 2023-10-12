@@ -19,7 +19,7 @@ class CalculateAngle {
 
     final PoseLandmark elbow = pose.landmarks[PoseLandmarkType.leftElbow]!;
 
-    final double angle = getAngle(wrist, elbow, shoulder);
+    final double angle = getAngle(shoulder, elbow, wrist);
 
     return angle;
   }

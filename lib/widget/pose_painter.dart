@@ -82,7 +82,7 @@ class PosePainter extends CustomPainter {
 
       //Draw Body
       // paintLine(
-      //     PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip, leftPaint);
+      //     PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip, leftPaint)
       // paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip,
       //     rightPaint);
 

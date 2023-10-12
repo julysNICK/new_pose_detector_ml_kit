@@ -28,8 +28,13 @@ class AngleVerifier {
   final AngleArrayValueVerifier angleArrayValueVerifier =
       AngleArrayValueVerifier();
 
-  bool verifyLengthArray(angleArray) {
-    return angleArrayLengthVerifier.verifyLengthArray(angleArray, 4, 5);
+  bool verifyLengthArray(
+    angleArray, {
+    int minLength = 4,
+    int maxLength = 5,
+  }) {
+    return angleArrayLengthVerifier.verifyLengthArray(
+        angleArray, minLength, maxLength);
   }
 
   int verifyAngle(angleHistory, angleThresholdMin, angleThresholdMax,
@@ -45,13 +50,16 @@ class AngleVerifier {
     if (angleHistory.length == historyLength &&
         isAngleInRange &&
         angleHistory.last <= limitAccept) {
+      print("Contei");
       //70 -> 75
       angleHistoryApproved.addAll(angleHistory);
       angleHistory.clear();
       return 1;
-    } else if (verifyLengthArray(angleHistory) &&
+    } else if (verifyLengthArray(angleHistory,
+            minLength: 3, maxLength: historyLength) &&
         isAngleInRange &&
         angleHistory.last <= limitAccept) {
+      print("Contei");
       angleHistoryApproved.addAll(angleHistory);
       angleHistory.clear();
       return 1;

@@ -66,6 +66,18 @@ class ManipulationArray {
     return false;
   }
 
+  double convertAngleHighestLimit(
+    double angle,
+    List<double> angleArray,
+  ) {
+    if (angle.round() > 190 &&
+        angleArray.isNotEmpty &&
+        angleArray.length == 2) {
+      return 25;
+    }
+    return angle.roundToDouble();
+  }
+
   void addAngleInArray2(
       List<double> angleArray,
       double angle,

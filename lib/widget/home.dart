@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (readyToStart == true) {
         double angleC = calculateAngle.calculateAngleInArmFlexion(pose);
 
-        int count = _armFlexionExercise.calculationRepetition(angleC);
+        int count = _babelExercise.calculationRepetition(angleC);
         // String suggestion = postSuggestion(angleC);
 
         String slopePosition = _data.slopeTrack.verifySlopeAngle(
