@@ -71,48 +71,48 @@ class PosePainter extends CustomPainter {
       }
 
       //Draw arms
-      paintLine(
-          PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, leftPaint);
-      paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow,
-          rightPaint);
-      paintLine(
-          PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist, rightPaint);
-
-      //Draw Body
       // paintLine(
-      //     PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip, leftPaint)
+      //     PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, leftPaint);
+      // paintLine(
+      //     PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, leftPaint);
+      // paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow,
+      //     rightPaint);
+      // paintLine(
+      //     PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist, rightPaint);
+
+      //Draw Body coluna ombro
+      // paintLine(
+      //     PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip, leftPaint);
       // paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip,
       //     rightPaint);
 
       //Draw legs
-      // paintLine(PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee, leftPaint);
-      // paintLine(
-      //     PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, leftPaint);
-      // paintLine(
-      //     PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee, rightPaint);
-      // paintLine(
-      //     PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, rightPaint);
+      paintLine(PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee, leftPaint);
+      paintLine(
+          PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, leftPaint);
+      paintLine(
+          PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee, rightPaint);
+      paintLine(
+          PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, rightPaint);
 
       // paintLine(
       //     PoseLandmarkType.leftWrist, PoseLandmarkType.leftThumb, leftPaint);
 
-      paintLine(
-          PoseLandmarkType.leftWrist, PoseLandmarkType.leftPinky, leftPaint);
+      // paintLine(
+      //     PoseLandmarkType.leftWrist, PoseLandmarkType.leftPinky, leftPaint);
 
-      paintLine(
-          PoseLandmarkType.leftWrist, PoseLandmarkType.leftIndex, leftPaint);
+      // paintLine(
+      //     PoseLandmarkType.leftWrist, PoseLandmarkType.leftIndex, leftPaint);
 
-      // Draw legs
-      paintLine(
-          PoseLandmarkType.rightWrist, PoseLandmarkType.rightThumb, rightPaint);
+      // Draw pulso
+      // paintLine(
+      //     PoseLandmarkType.rightWrist, PoseLandmarkType.rightThumb, rightPaint);
 
-      paintLine(
-          PoseLandmarkType.rightWrist, PoseLandmarkType.rightPinky, rightPaint);
+      // paintLine(
+      //     PoseLandmarkType.rightWrist, PoseLandmarkType.rightPinky, rightPaint);
 
-      paintLine(
-          PoseLandmarkType.rightWrist, PoseLandmarkType.rightIndex, rightPaint);
+      // paintLine(
+      //     PoseLandmarkType.rightWrist, PoseLandmarkType.rightIndex, rightPaint);
     }
   }
 

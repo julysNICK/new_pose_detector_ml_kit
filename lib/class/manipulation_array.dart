@@ -23,12 +23,14 @@ class ManipulationArray {
 
   bool isInBetweenInFall(
       int roundedAngle, double limitHigherFall, double limitLowerFall) {
-    return (roundedAngle >= limitLowerFall && roundedAngle <= limitHigherFall);
+    return (roundedAngle >= limitLowerFall &&
+        roundedAngle <= limitHigherFall); // 190 - 220
   }
 
   bool isInBetweenRise(
       int roundedAngle, double limitHigherRise, double limitLowerRise) {
-    return (roundedAngle >= limitLowerRise && roundedAngle < limitHigherRise);
+    return (roundedAngle >= limitLowerRise &&
+        roundedAngle < limitHigherRise); // 180 - 186
   }
 
   bool shouldAddAngleToArray(

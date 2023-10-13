@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   CalculateAngle calculateAngle = CalculateAngle();
 
   final Exercise _babelExercise = BarbellExercise().createExercise();
-  final Exercise _squatExercise = SquatExercise().createExercise();
+  final Exercise _squatExercise = SquatExerciseSide().createExercise();
   final Exercise _armFlexionExercise = ArmFlexionExercise().createExercise();
 
   Future initCamera() async {
@@ -131,9 +131,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     for (Pose pose in poses) {
       if (readyToStart == true) {
-        double angleC = calculateAngle.calculateAngleInArmFlexion(pose);
+        double angleC = calculateAngle.calculateAngleInSquat(pose);
 
-        int count = _babelExercise.calculationRepetition(angleC);
+        int count = _squatExercise.calculationRepetition(angleC);
         // String suggestion = postSuggestion(angleC);
 
         String slopePosition = _data.slopeTrack.verifySlopeAngle(

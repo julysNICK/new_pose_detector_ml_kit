@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:new_pose_test/class/exercise.dart';
 import 'package:new_pose_test/class/repetition_calculation_squart.dart';
 
-class SquatExerciseSide implements Exercise {
-  SquatExerciseSide();
+class SquatExerciseFront implements Exercise {
+  SquatExerciseFront();
 
   RepetitionCalculationSquatFront repetitionCalculation =
       RepetitionCalculationSquatFront();
@@ -17,6 +17,6 @@ class SquatExerciseSide implements Exercise {
 
   @override
   Exercise createExercise() {
-    return SquatExerciseSide();
+    return SquatExerciseFront();
   }
 }
