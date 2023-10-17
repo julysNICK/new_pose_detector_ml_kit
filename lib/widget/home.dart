@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:new_pose_test/class/calculate_angle.dart';
 import 'package:new_pose_test/class/class_arm_flexion.dart';
+import 'package:new_pose_test/class/class_barbell_front.dart';
 import 'package:new_pose_test/class/class_squat.dart';
 import 'package:new_pose_test/class/exercise.dart';
 import 'package:new_pose_test/class/handle_camera.dart';
@@ -66,6 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
   CalculateAngle calculateAngle = CalculateAngle();
 
   final Exercise _babelExercise = BarbellExercise().createExercise();
+
+  final Exercise _babelFrontExercise = BarbellExerciseFront().createExercise();
   final Exercise _squatExercise = SquatExerciseSide().createExercise();
   final Exercise _armFlexionExercise = ArmFlexionExercise().createExercise();
 
@@ -123,6 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  final AngleCalculator angleCalculator = AngleCalculator();
   _updatePoseState() async {
     var frameImg =
         getImage.getInputImage(cameraDescription, _data.controller, img);
@@ -131,11 +135,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
     for (Pose pose in poses) {
       if (readyToStart == true) {
-        double angleC = calculateAngle.calculateAngleInSquat(pose);
+        double angleC = calculateAngle.calculateAngleInArmFlexion(pose);
 
-        int count = _squatExercise.calculationRepetition(angleC);
+        int count = _armFlexionExercise.calculationRepetition(angleC);
         // String suggestion = postSuggestion(angleC);
-
+        double angle = angleCalculator.slopeLine(
+          pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
+          pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
+          pose.landmarks[PoseLandmarkType.leftHip]!.x,
+          pose.landmarks[PoseLandmarkType.leftHip]!.y,
+        );
         String slopePosition = _data.slopeTrack.verifySlopeAngle(
           pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
           pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
@@ -148,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
           this.count = count + this.count;
           suggestion = suggestion;
           this.slopePosition = slopePosition;
-          angleBarbell = angleC;
+          angleBarbell = angle;
         });
       }
     }

@@ -43,6 +43,7 @@ class SlopeTrack {
   verifySlopeAngle(
       double xShoulder, double yShoulder, double xHip, double yHip) {
     double angle = angleCalculator.slopeLine(xShoulder, yShoulder, xHip, yHip);
+
     return slopeVerifier.verifySlopeAngle(angle);
   }
 }

@@ -4,8 +4,8 @@ import 'package:new_pose_test/class/exercise.dart';
 import 'package:new_pose_test/class/repetition_calculation.dart';
 import 'package:new_pose_test/class/repetition_calculation_front.dart';
 
-class BarbellExercise implements Exercise {
-  BarbellExercise();
+class BarbellExerciseFront implements Exercise {
+  BarbellExerciseFront();
 
   RepetitionCalculationBarbelFront repetitionCalculation =
       RepetitionCalculationBarbelFront();
@@ -18,6 +18,6 @@ class BarbellExercise implements Exercise {
 
   @override
   Exercise createExercise() {
-    return BarbellExercise();
+    return BarbellExerciseFront();
   }
 }
