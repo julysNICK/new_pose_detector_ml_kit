@@ -32,6 +32,16 @@ class AngleCalculator {
     double angle = atan2(y2 - y1, x2 - x1);
     return angle;
   }
+
+  double slopeLineWithZPoint(double z1, double z2) {
+    double plain = 0;
+
+    double column = (z1 + z2) / 2;
+
+    double angle = atan2(column - plain, z2 - z1);
+
+    return angle;
+  }
 }
 
 class SlopeTrack {

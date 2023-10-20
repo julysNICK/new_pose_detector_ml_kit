@@ -39,18 +39,18 @@ class AngleVerifier {
 
   int verifyAngle(angleHistory, angleThresholdMin, angleThresholdMax,
       historyLength, angleHistoryApproved, limitAccept) {
-    print("angleHistory $angleHistory");
-    print(
-        "verifyLengthArray(5, angleHistory) ${verifyLengthArray(angleHistory)}");
+    // print("angleHistory $angleHistory");
+    // print(
+    //     "verifyLengthArray(5, angleHistory) ${verifyLengthArray(angleHistory)}");
 
     bool isAngleInRange = angleArrayValueVerifier.verifyAngleArray(
         angleHistory, angleThresholdMin, angleThresholdMax);
-    print("isAngleInRange $isAngleInRange");
+    // print("isAngleInRange $isAngleInRange");
 
     if (angleHistory.length == historyLength &&
         isAngleInRange &&
         angleHistory.last <= limitAccept) {
-      print("Contei");
+      // print("Contei");
       //70 -> 75
       angleHistoryApproved.addAll(angleHistory);
       angleHistory.clear();
@@ -59,7 +59,7 @@ class AngleVerifier {
             minLength: 3, maxLength: historyLength) &&
         isAngleInRange &&
         angleHistory.last <= limitAccept) {
-      print("Contei");
+      // print("Contei");
       angleHistoryApproved.addAll(angleHistory);
       angleHistory.clear();
       return 1;

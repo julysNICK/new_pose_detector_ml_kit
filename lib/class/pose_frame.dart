@@ -42,7 +42,7 @@ class PoseFrame {
       String slopePosition,
       dynamic scanResults,
       bool isBusy) async {
-    print("chamei");
+    // print("chamei");
     var frameImg = getImage.getInputImage(cameraDescription, controller, img);
 
     poses = await poseDetection.processImage(frameImg);

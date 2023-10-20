@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:new_pose_test/class/calculate_angle.dart';
+import 'package:new_pose_test/class/calculate_distance_point.dart';
 import 'package:new_pose_test/class/class_arm_flexion.dart';
 import 'package:new_pose_test/class/class_barbell_front.dart';
 import 'package:new_pose_test/class/class_squat.dart';
+import 'package:new_pose_test/class/distance_range_checker.dart';
 import 'package:new_pose_test/class/exercise.dart';
 import 'package:new_pose_test/class/handle_camera.dart';
 import 'package:new_pose_test/class/image_lib.dart';
@@ -65,6 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isRepeting = false;
   GetImage getImage = GetImage();
   CalculateAngle calculateAngle = CalculateAngle();
+  CalculateDistancePoint calculateDistancePoint = CalculateDistancePoint();
+  DistanceRangeChecker distanceRangeChecker = DistanceRangeChecker();
 
   final Exercise _babelExercise = BarbellExercise().createExercise();
 
@@ -136,15 +140,17 @@ class _MyHomePageState extends State<MyHomePage> {
     for (Pose pose in poses) {
       if (readyToStart == true) {
         double angleC = calculateAngle.calculateAngleInArmFlexion(pose);
+        double distanceS = calculateDistancePoint.distanceElbow(pose);
+
+        String position = distanceRangeChecker.rangeKneeShoulder(distanceS);
 
         int count = _armFlexionExercise.calculationRepetition(angleC);
         // String suggestion = postSuggestion(angleC);
-        double angle = angleCalculator.slopeLine(
-          pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
-          pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
-          pose.landmarks[PoseLandmarkType.leftHip]!.x,
-          pose.landmarks[PoseLandmarkType.leftHip]!.y,
+        double angle = angleCalculator.slopeLineWithZPoint(
+          pose.landmarks[PoseLandmarkType.leftShoulder]!.z,
+          pose.landmarks[PoseLandmarkType.leftHip]!.z,
         );
+        print("angle: $angle");
         String slopePosition = _data.slopeTrack.verifySlopeAngle(
           pose.landmarks[PoseLandmarkType.leftShoulder]!.x,
           pose.landmarks[PoseLandmarkType.leftShoulder]!.y,
@@ -156,8 +162,8 @@ class _MyHomePageState extends State<MyHomePage> {
           // distanceWristAndShoulder = distanceWristAndShoulder;
           this.count = count + this.count;
           suggestion = suggestion;
-          this.slopePosition = slopePosition;
-          angleBarbell = angle;
+          this.slopePosition = position;
+          angleBarbell = distanceS;
         });
       }
     }
@@ -202,12 +208,12 @@ class _MyHomePageState extends State<MyHomePage> {
           Text(
             "Angle flexion Arm: $angleBarbell",
             style: const TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontSize: 20.0,
             ),
           ),
           Text(
-            "Slope Position: $slopePosition",
+            "DIstance Knee: $slopePosition",
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20.0,
@@ -299,10 +305,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: InkWell(
           onTap: () {
             //change readyToStart to true after 5 seconds
-            print("chamei onTap");
+            // print("chamei onTap");
 
             Future.delayed(const Duration(seconds: 5), () {
-              print("chamei Future.delayed");
+              // print("chamei Future.delayed");
               setState(() {
                 readyToStart = true;
               });
